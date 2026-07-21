@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Navigation, Car, Bike, Zap, Bus, Train, Fuel, Sparkles, CheckCircle2, Save, Volume2 } from 'lucide-react';
+import { Navigation, Car, Bike, Zap, Bus, Train, Fuel, Sparkles, CheckCircle2, Save } from 'lucide-react';
 import RouteMap from '../components/RouteMap';
 import WeatherCard from '../components/WeatherCard';
-import VoiceAssistantPanel from '../components/VoiceAssistantPanel';
 import TreeCalculatorCard from '../components/TreeCalculatorCard';
-import { useVoice } from '../context/VoiceContext';
 import api from '../utils/api';
 import confetti from 'canvas-confetti';
 
@@ -18,8 +16,6 @@ export default function RoutePlanner() {
   const [planResult, setPlanResult] = useState(null);
   const [selectedRouteId, setSelectedRouteId] = useState(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
-
-  const { speakText } = useVoice();
 
   const handlePlanRoute = async (e) => {
     e?.preventDefault();
@@ -40,8 +36,6 @@ export default function RoutePlanner() {
         const recommended = res.data.routes.find(r => r.isRecommended) || res.data.routes[0];
         setSelectedRouteId(recommended.id);
       }
-      speakText('welcome');
-      setTimeout(() => speakText('recommendation'), 2500);
     } catch (err) {
       console.error('Error planning route:', err);
     } finally {
@@ -75,7 +69,6 @@ export default function RoutePlanner() {
 
       setSavedSuccess(true);
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      speakText('co2Savings');
     } catch (err) {
       setSavedSuccess(true);
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
@@ -243,17 +236,9 @@ export default function RoutePlanner() {
           {/* Gemini AI Recommendation Banner */}
           {planResult?.aiRecommendation && (
             <div className="bg-gradient-to-r from-emerald-900 via-primary-800 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-emerald-400/40 space-y-2 relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-emerald-300 font-extrabold text-xs">
-                  <Sparkles className="w-4 h-4" />
-                  Google Gemini AI Eco Recommendation
-                </div>
-                <button
-                  onClick={() => speakText(planResult.aiRecommendation)}
-                  className="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-[11px] font-bold flex items-center gap-1 text-white transition-colors"
-                >
-                  <Volume2 className="w-3.5 h-3.5" /> Speak Insights
-                </button>
+              <div className="flex items-center gap-2 text-emerald-300 font-extrabold text-xs">
+                <Sparkles className="w-4 h-4" />
+                Google Gemini AI Eco Recommendation
               </div>
               <p className="text-xs sm:text-sm font-medium leading-relaxed text-emerald-50">
                 "{planResult.aiRecommendation}"
@@ -318,9 +303,6 @@ export default function RoutePlanner() {
           {planResult?.weather && (
             <WeatherCard weather={planResult.weather} />
           )}
-
-          {/* Voice Assistant Panel */}
-          <VoiceAssistantPanel />
 
         </div>
 
